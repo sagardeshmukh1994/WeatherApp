@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Toast.makeText(MainActivity.this, "Json Data is downloading", Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this, "Weather Data is downloading", Toast.LENGTH_LONG).show();
         }
 
         @Override
