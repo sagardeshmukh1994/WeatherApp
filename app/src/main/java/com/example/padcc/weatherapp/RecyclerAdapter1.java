@@ -9,14 +9,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
-
-import java.util.ArrayList;
 import java.util.List;
 
-public class RecyclerAdapter extends  RecyclerView.Adapter<RecyclerAdapter.ViewHolder>  {
+public class RecyclerAdapter1 extends  RecyclerView.Adapter<RecyclerAdapter1.ViewHolder>  {
 
-    private List<Weather> mData;
+    private List<List1> mData;
 
     private LayoutInflater mInflater;
 
@@ -25,7 +22,7 @@ public class RecyclerAdapter extends  RecyclerView.Adapter<RecyclerAdapter.ViewH
     private ItemClickListener mClickListener;
 
 
-    public RecyclerAdapter(Context context, List<Weather> weather) {
+    public RecyclerAdapter1(Context context, List<List1> weather) {
         mInflater=LayoutInflater.from(context);
         this.mData=weather;
         this.mContext=context;
@@ -34,21 +31,24 @@ public class RecyclerAdapter extends  RecyclerView.Adapter<RecyclerAdapter.ViewH
 
     @NonNull
     @Override
-    public RecyclerAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public RecyclerAdapter1.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
 
         View view=mInflater.inflate(R.layout.weatherdatalist,viewGroup,false);
 
-        return new ViewHolder(view);
+        return new RecyclerAdapter1.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerAdapter.ViewHolder holder, int position) {
-       holder.txtid.setText(String.valueOf(mData.get(position).getId()));
-       holder.txtmain.setText(String.valueOf(mData.get(position).getMain()));
-       holder.txtdesc.setText(String.valueOf(mData.get(position).getDescription()));
-       holder.txticon.setText(mData.get(position).getIcon());
+    public void onBindViewHolder(@NonNull RecyclerAdapter1.ViewHolder holder, int position) {
 
-       // Picasso.with(mContext).load(mData.get(position).getImageUrl()).fit().into(holder.imgProductImage);
+
+
+        holder.txtid.setText(String.valueOf(mData.get(position).getWeather().get(0).getId()));
+        holder.txtmain.setText(String.valueOf(mData.get(position).getWeather().get(0).getMain()));
+        holder.txtdesc.setText(String.valueOf(mData.get(position).getWeather().get(0).getDescription()));
+        holder.txticon.setText(mData.get(position).getWeather().get(0).getIcon());
+
+        // Picasso.with(mContext).load(mData.get(position).getImageUrl()).fit().into(holder.imgProductImage);
 
     }
 
@@ -71,7 +71,7 @@ public class RecyclerAdapter extends  RecyclerView.Adapter<RecyclerAdapter.ViewH
             txtmain = itemView.findViewById(R.id.main);
             txtdesc = itemView.findViewById(R.id.description);
             txticon = itemView.findViewById(R.id.weathericon);
-           // imgProductImage=itemView.findViewById(R.id.imageView);
+            // imgProductImage=itemView.findViewById(R.id.imageView);
             itemView.setOnClickListener(this);
         }
 

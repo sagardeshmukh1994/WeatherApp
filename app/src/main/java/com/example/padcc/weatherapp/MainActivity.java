@@ -1,5 +1,6 @@
 package com.example.padcc.weatherapp;
 
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 
 import com.example.padcc.weatherapp.ItemClickListener;
 import com.example.padcc.weatherapp.R;
+import com.google.gson.Gson;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -27,14 +29,20 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements ItemClickListener {
 
-    public ArrayList<Weather> weatherarray = new ArrayList<Weather>();
+    public List<Weather> weatherarray = new ArrayList<Weather>();
     private String TAG = MainActivity.class.getSimpleName();
 
     RecyclerView recyclerView;
     RecyclerAdapter recyclerAdapter;
+    RecyclerAdapter1 recyclerAdapter1;
+
+    List<List1> list1;
+
+    private ProgressDialog progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,9 +51,9 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view_weather);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerAdapter = new RecyclerAdapter(MainActivity.this, weatherarray);
-        recyclerAdapter.setClickListener(this);
-        recyclerView.setAdapter(recyclerAdapter);
+//        recyclerAdapter = new RecyclerAdapter(MainActivity.this, weatherarray);
+//        recyclerAdapter.setClickListener(this);
+//        recyclerView.setAdapter(recyclerAdapter);
 
 
         new GetWeather().execute();
@@ -62,7 +70,13 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Toast.makeText(MainActivity.this, "Weather Data is downloading", Toast.LENGTH_LONG).show();
+            progress=new ProgressDialog(MainActivity.this);
+            progress.setMessage("Downloading Weather Data");
+            progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+          //  progress.setIndeterminate(true);
+           // progress.setProgress(0);
+          //  progress.show();
+           // Toast.makeText(MainActivity.this, "Weather Data is downloading", Toast.LENGTH_LONG).show();
         }
 
         @Override
@@ -88,44 +102,47 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
             }
             Log.e(TAG, "Response from url: " + jsonStr);
             if (jsonStr != null) {
-                try {
-//                    // Getting JSON Array
-//                   JSONArray users = new JSONArray(jsonStr);
+               WeatherData weatherData1= new Gson().fromJson(jsonStr, WeatherData.class);
+               weatherarray=weatherData1.getList().get(0).getWeather();
+
+                list1=weatherData1.getList();
+
+
+
+
+
+//                try {
+//                    JSONObject jsonObject = new JSONObject(jsonStr);
+//                    JSONArray jsonArray = new JSONArray();
+//                    jsonArray = jsonObject.getJSONArray("list");
+//                    for (int i = 0; i < jsonArray.length(); i++) {
+//                        JSONObject data = jsonArray.getJSONObject(i);
+//                        JSONArray jsonweatherArray = new JSONArray();
+//                        jsonweatherArray = data.getJSONArray("weather");
+//                        for (int j = 0; j < jsonweatherArray.length(); j++) {
+//                            JSONObject weatherdata = jsonweatherArray.getJSONObject(j);
 //
-//                    // looping through All Contacts
-//                    for (int i = 0; i < users.length(); i++) {
-//                        JSONObject pObj = users.getJSONObject(i);
-                    JSONObject jsonObject = new JSONObject(jsonStr);
-                    JSONArray jsonArray = new JSONArray();
-                    jsonArray = jsonObject.getJSONArray("list");
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject data = jsonArray.getJSONObject(i);
-                        JSONArray jsonweatherArray = new JSONArray();
-                        jsonweatherArray = data.getJSONArray("weather");
-                        for (int j = 0; j < jsonweatherArray.length(); j++) {
-                            JSONObject weatherdata = jsonweatherArray.getJSONObject(j);
-
-                            Weather weatherData = new Weather();
-                            try {
-                                weatherData.setId(weatherdata.getString("id"));
-                                weatherData.setMain(weatherdata.getString("main"));
-                                weatherData.setDescription(weatherdata.getString("description"));
-                                weatherData.setIcon(weatherdata.getString("icon"));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                              }
-
-                            //  weatherdata.setUnit(weatherdata.getString("unit"));
-
-                            weatherarray.add(weatherData);
-                        }
-                    }
-                } catch (final JSONException e) {
-                    Log.e(TAG, "Json parsing error: " + e.getMessage());
-                    Toast.makeText(getApplicationContext(),
-                            "Json parsing error: " + e.getMessage(),
-                            Toast.LENGTH_LONG).show();
-                }
+//                            Weather weatherData = new Weather();
+//                            try {
+//                                weatherData.setId(weatherdata.getInt("id"));
+//                                weatherData.setMain(weatherdata.getString("main"));
+//                                weatherData.setDescription(weatherdata.getString("description"));
+//                                weatherData.setIcon(weatherdata.getString("icon"));
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                              }
+//
+//                            //  weatherdata.setUnit(weatherdata.getString("unit"));
+//
+//                            weatherarray.add(weatherData);
+//                        }
+//                    }
+//                } catch (final JSONException e) {
+//                    Log.e(TAG, "Json parsing error: " + e.getMessage());
+//                    Toast.makeText(getApplicationContext(),
+//                            "Json parsing error: " + e.getMessage(),
+//                            Toast.LENGTH_LONG).show();
+//                }
             } else {
                 Log.e(TAG, "Couldn't get json from server.");
                 Toast.makeText(getApplicationContext(),
@@ -138,8 +155,16 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
+        if(progress.isShowing())
+        {
+            progress.dismiss();
+        }
 
-            recyclerAdapter.notifyDataSetChanged();
+            recyclerAdapter1 = new RecyclerAdapter1(MainActivity.this, list1);
+            // recyclerAdapter.setClickListener(this);
+            recyclerView.setAdapter(recyclerAdapter1);
+
+           // recyclerAdapter.notifyDataSetChanged();
 
         }
     }
